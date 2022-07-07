@@ -1,0 +1,96 @@
+EyeBlinkLeft:
+    -   controller: UpEyeLid_L
+    -   controller: UpEyeBLid_L
+    -   controller: UpEyeCLid_L
+    -   controller: DnEyeLid_L
+    -   controller: DnEyeBLid_L
+    -   controller: DnEyeCLid_L
+EyeLookDownLeft:
+    -   controller: AimEye_L
+    -   controller: AimEyeB_L
+    -   controller: AimEyeC_L
+EyeLookInLeft:
+    -   controller: AimEye_L
+    -   controller: AimEyeB_L
+    -   controller: AimEyeC_L
+EyeLookOutLeft:
+    -   controller: AimEye_L
+    -   controller: AimEyeB_L
+    -   controller: AimEyeC_L
+EyeLookUpLeft:
+    -   controller: AimEye_L
+    -   controller: AimEyeB_L
+    -   controller: AimEyeC_L
+EyeBlinkLeft:
+    -   controller: UpEyeLid_L
+    -   controller: UpEyeBLid_L
+    -   controller: UpEyeCLid_L
+    -   controller: DnEyeLid_L
+    -   controller: DnEyeBLid_L
+    -   controller: DnEyeCLid_L
+EyeSquintLeft:
+    -   controller: DnEyeLid_L
+    -   controller: DnEyeBLid_L
+    -   controller: DnEyeCLid_L
+EyeWideLeft:
+    -   controller: UpEyeLid_L
+    -   controller: UpEyeBLid_L
+    -   controller: UpEyeCLid_L
+EyeBlinkRight:
+    -   controller: UpEyeLid_R
+    -   controller: UpEyeBLid_R
+    -   controller: UpEyeCLid_R
+    -   controller: DnEyeLid_R
+    -   controller: DnEyeBLid_R
+    -   controller: DnEyeCLid_R
+EyeLookDownRight:
+    -   controller: AimEye_R
+    -   controller: AimEyeB_R
+    -   controller: AimEyeC_R
+EyeLookInRight:
+    -   controller: AimEye_R
+    -   controller: AimEyeB_R
+    -   controller: AimEyeC_R
+EyeLookOutRight:
+    -   controller: AimEye_R
+    -   controller: AimEyeB_R
+    -   controller: AimEyeC_R
+EyeLookUpRight:
+    -   controller: AimEye_R
+    -   controller: AimEyeB_R
+    -   controller: AimEyeC_R
+EyeSquintRight:
+    -   controller: DnEyeLid_R
+    -   controller: DnEyeBLid_R
+    -   controller: DnEyeCLid_R
+EyeWideRight:
+    -   controller: UpEyeLid_R
+    -   controller: UpEyeBLid_R
+    -   controller: UpEyeCLid_R
+JawForward:
+    -   controller: FKJaw_M
+JawRight:
+    -   controller: FKJaw_M
+JawLeft:
+    -   controller: FKJaw_M
+JawOpen:
+    -   controller: FKJaw_M
+BrowDownLeft:
+    -   controller: InrBrow_L
+BrowDownRight:
+    -   controller: InrBrow_R
+BrowInnerUp:
+    -   controller: InrBrow_L
+    -   controller: InrBrow_R
+BrowOuterUpLeft:
+    -   controller: OutBrow_L
+BrowOuterUpRight:
+    -   controller: OutBrow_R
+NoseSneerLeft:
+    -   controller: BreathInOut_L
+    -   controller: BreathBInOut_L
+    -   controller: BreathCInOut_L
+NoseSneerRight:
+    -   controller: BreathInOut_R
+    -   controller: BreathBInOut_R
+    -   controller: BreathCInOut_R
