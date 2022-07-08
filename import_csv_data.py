@@ -1,6 +1,10 @@
 import csv
-import maya.cmds
+import maya.cmds as cmds
 import sys
+import os
+from os import listdir
+from os.path import isfile, join
+
 def add_path(path):
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -11,67 +15,34 @@ print(python_version)
 # yaml
 add_path(r'I:\script\bin\td\3rd\lib\python\%s' % python_version)
 import yaml
-path = "D:\\workspace\\td\\MyState_15_ARKit_iPhone.csv"
-file = open(path)
-reader = csv.reader(file)
 
-header = next(reader)
-data = [row for row in reader]
-
-import maya.cmds as cmds
-
-import random
-
-def cleanData():
-    global data
+def cleanData(data):
     newData = []
     lastTimeCode = 0
     lastData = []
     for d in data:
+        if len(d) < 1: continue
         timeCode = int(d[0][-3:])
         if d[1] == "0": continue
-        if lastTimeCode > 0:
+        # if lastTimeCode > 0:
+        if lastTimeCode > 1000:
             if timeCode - lastTimeCode > 1:
                 for i in range(0, timeCode - lastTimeCode):
                     newData.append(lastData)
         newData.append(d)
         lastData = d
         lastTimeCode = timeCode
-    data = newData
-
-def selectNurbsCurve(nurbsCurveName):
-    curve_transforms = [cmds.listRelatives(i, p=1, type='transform')[0] for i
-    in cmds.ls(type='nurbsCurve', o=1, r=1, ni=1)]
-
-    for curve in curve_transforms:
-        name = curve.split(":")
-        if nurbsCurveName == name[1]:
-            cmds.select(curve)
-
-# selectNurbsCurve("UpEyeLid_R")
-
-def read_yaml(path):
-    u"""Read data from path as yaml format.
-    """
-    with open(path) as f:
-        return yaml.load(f)
-
-def setKeyframes(key, reverse=False):
-    obj = cmds.ls(selection=True)[0]
-
-    frame = 0
-    cmds.setKeyframe(obj + '.translateY', value=0, time=0)
-    frame += 1
+    return newData
+    
+def createAnimationArr(data):
     multiplier = 2
+    animationArr = []
     for d in data:
         if len(d) < 3: continue
         dataDict = {}
         translateDict = {}
         translateDict['EyeBlinkLeft'] = '.translateY'
-        if reverse:
-            dataDict['EyeBlinkLeft'] = float(d[2])*multiplier * -1
-        else:
-            dataDict['EyeBlinkLeft'] = float(d[2])*multiplier
+        dataDict['EyeBlinkLeft'] = float(d[2])*multiplier
 
         translateDict['EyeLookDownLeft'] = '.translateY'
         dataDict['EyeLookDownLeft'] = float(d[3])*multiplier * -1
@@ -93,10 +64,7 @@ def setKeyframes(key, reverse=False):
 
 
         translateDict['EyeBlinkRight'] = '.translateY'
-        if reverse:
-            dataDict['EyeBlinkRight'] = float(d[2])*multiplier * -1
-        else:
-            dataDict['EyeBlinkRight'] = float(d[2])*multiplier
+        dataDict['EyeBlinkRight'] = float(d[2])*multiplier
 
         translateDict['EyeLookDownRight'] = '.translateY'
         dataDict['EyeLookDownRight'] = float(d[3])*multiplier * -1
@@ -149,9 +117,42 @@ def setKeyframes(key, reverse=False):
 
         translateDict['NoseSneerRight'] = '.translateY'
         dataDict['NoseSneerRight'] = float(d[3])*multiplier
-        print(d[0], key)
 
+        animationDict = {}
+        animationDict['data'] = dataDict
+        animationDict['translate'] = translateDict
+        animationArr.append(animationDict)
+    return animationArr
 
+def selectNurbsCurve(nurbsCurveName):
+    curve_transforms = [cmds.listRelatives(i, p=1, type='transform')[0] for i
+    in cmds.ls(type='nurbsCurve', o=1, r=1, ni=1)]
+
+    for curve in curve_transforms:
+        if nurbsCurveName == curve:
+            return curve
+    return ""
+
+# selectNurbsCurve("UpEyeLid_R")
+
+def read_yaml(path):
+    u"""Read data from path as yaml format.
+    """
+    with open(path) as f:
+        return yaml.load(f)
+
+def setKeyframes(obj, data, key, reverse=False):
+    val = 1
+    if reverse: val = -1
+
+    frame = 0
+    cmds.setKeyframe(obj + '.translateY', value=0, time=0)
+    frame += 1
+
+    animationArr = []
+    for d in data:
+        translateDict = d['translate']
+        dataDict = d['data']
         
         if "Squint" in key:
             if key == 'EyeSquintLeft':
@@ -161,24 +162,44 @@ def setKeyframes(key, reverse=False):
                 if dataDict['EyeSquintRight'] < dataDict['EyeBlinkRight']:
                     cmds.setKeyframe(obj + translateDict[key], value=dataDict[key], time=frame)
         else:
-            cmds.setKeyframe(obj + translateDict[key], value=dataDict[key], time=frame)
+            cmds.setKeyframe(obj + translateDict[key], value=dataDict[key]*val, time=frame)
         
         frame += 1
 
-def insertKey():
-    mapping_path = "D:\\workspace\\td\\mocap_facial\\yaml\\blendshape_mapping.yaml"
-    mapping_rules = read_yaml(mapping_path)
-    print(mapping_rules)
+def getData(path):
+    data = []
+    with open(path) as f:
+        reader = csv.reader(f)
+        header = next(reader)
+        data = [row for row in reader]
+       
+    return data
 
-    print(len(data))
-    cleanData()
-    print(len(data))
-    for key, value in  mapping_rules.iteritems():
-        controllers = mapping_rules.get(key, None)
-        for mapping_kwargs in controllers:
-            controller = mapping_kwargs.pop('controller')
-            selectNurbsCurve(controller)
-            reverse = controller.startswith('Dn')
-            setKeyframes(key, reverse)
-    
-insertKey()
+def insertKey():
+    mapping_path = "D:/workspace/td/mocap_facial/yaml/blendshape_mapping.yaml"
+    facialPath = "J:/test_project/work/progress/mcp/satou_test/facial/facialData"
+    # rigFile = 'J:/test_project/work/document/from_client/BIJJ/tianYuanMoAvA/rig/hx_pub_char_tianYuanMoAvA_rig_v006.ma'
+    rigFile = 'J:/test_project/work/progress/mcp/satou_test/rig/hx_pub_char_tianYuanMoAvA_rig_v006.ma'
+    outPutPath = 'J:/test_project/work/progress/mcp/satou_test/facial/maya'
+
+    mapping_rules = read_yaml(mapping_path)
+    onlyfiles = [f for f in listdir(facialPath) if isfile(join(facialPath, f))]
+
+    for f in onlyfiles:
+        filePath = facialPath+'/'+f
+        data = getData(filePath)
+        data = cleanData(data)
+        animationArr = createAnimationArr(data)
+        fileName = os.path.splitext(f)[0]
+        print(fileName)
+        cmds.file(rigFile, open=True, force=True)
+        for key, value in  mapping_rules.iteritems():
+            controllers = mapping_rules.get(key, None)
+            for mapping_kwargs in controllers:
+                controller = mapping_kwargs['controller']
+                curve = selectNurbsCurve(controller)
+                print(curve)
+                reverse = controller.startswith('Dn')
+                setKeyframes(curve, animationArr, key, reverse)
+        cmds.file(rename=outPutPath+'/'+fileName+".ma")
+        cmds.file(save=True, type="mayaAscii")
